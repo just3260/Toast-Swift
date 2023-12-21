@@ -42,13 +42,13 @@ public extension UIView {
      Keys used for associated objects.
      */
     private struct ToastKeys {
-        static var timer        = "com.toast-swift.timer"
-        static var duration     = "com.toast-swift.duration"
-        static var point        = "com.toast-swift.point"
-        static var completion   = "com.toast-swift.completion"
-        static var activeToasts = "com.toast-swift.activeToasts"
-        static var activityView = "com.toast-swift.activityView"
-        static var queue        = "com.toast-swift.queue"
+        static var timer        = "com.toast-swift.timer".hash
+        static var duration     = "com.toast-swift.duration".hash
+        static var point        = "com.toast-swift.point".hash
+        static var completion   = "com.toast-swift.completion".hash
+        static var activeToasts = "com.toast-swift.activeToasts".hash
+        static var activityView = "com.toast-swift.activityView".hash
+        static var queue        = "com.toast-swift.queue".hash
     }
     
     /**
@@ -426,6 +426,13 @@ public extension UIView {
         wrapperView.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin, .flexibleBottomMargin]
         wrapperView.layer.cornerRadius = style.cornerRadius
         
+        var labelStackView = UIStackView()
+        labelStackView.backgroundColor = .clear
+        labelStackView.axis = .vertical
+        labelStackView.alignment = .leading
+        labelStackView.distribution  = .fill
+        labelStackView.spacing = 10
+        
         if style.displayShadow {
             wrapperView.layer.shadowColor = UIColor.black.cgColor
             wrapperView.layer.shadowOpacity = style.shadowOpacity
@@ -509,16 +516,21 @@ public extension UIView {
         
         wrapperView.frame = CGRect(x: 0.0, y: 0.0, width: wrapperWidth, height: wrapperHeight)
         
+        var stackViewRect = CGRect.zero
+        stackViewRect.origin.x = imageRect.origin.x + imageRect.size.width + style.horizontalPadding
+        stackViewRect.origin.y = style.verticalPadding
+        stackViewRect.size.width = longerWidth
+        stackViewRect.size.height = wrapperHeight - (style.verticalPadding * 2.0)
+        labelStackView.frame = stackViewRect
+        
+        wrapperView.addSubview(labelStackView)
+        
         if let titleLabel = titleLabel {
-            titleRect.size.width = longerWidth
-            titleLabel.frame = titleRect
-            wrapperView.addSubview(titleLabel)
+            labelStackView.addArrangedSubview(titleLabel)
         }
         
         if let messageLabel = messageLabel {
-            messageRect.size.width = longerWidth
-            messageLabel.frame = messageRect
-            wrapperView.addSubview(messageLabel)
+            labelStackView.addArrangedSubview(messageLabel)
         }
         
         if let imageView = imageView {
@@ -587,7 +599,7 @@ public struct ToastStyle {
      Default is 10.0.
      
     */
-    public var horizontalPadding: CGFloat = 10.0
+    public var horizontalPadding: CGFloat = 20.0
     
     /**
      The spacing from the vertical edge of the toast view to the content. When a title
@@ -595,7 +607,7 @@ public struct ToastStyle {
      Default is 10.0. On iOS11+, this value is added added to the `safeAreaInset.top`
      and `safeAreaInsets.bottom`.
     */
-    public var verticalPadding: CGFloat = 10.0
+    public var verticalPadding: CGFloat = 20.0
     
     /**
      The corner radius. Default is 10.0.
